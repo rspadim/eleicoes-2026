@@ -11,7 +11,7 @@
     "start": "node src/server/index.js",
     "dev": "node --watch src/server/index.js",
     "geo": "node scripts/build-geo.mjs",
-    "test": "node --test test/"
+    "test": "node --test test/index.js"
   },
   "dependencies": {
     "ws": "^8.22.0"
