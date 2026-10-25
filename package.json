@@ -1,0 +1,19 @@
+{
+  "name": "eleicoes-2026",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Acompanhamento em tempo real da apuracao das eleicoes 2026 (fonte: TSE) com historico e replay",
+  "engines": {
+    "node": ">=22.5"
+  },
+  "scripts": {
+    "start": "node src/server/index.js",
+    "dev": "node --watch src/server/index.js",
+    "geo": "node scripts/build-geo.mjs",
+    "test": "node --test test/"
+  },
+  "dependencies": {
+    "ws": "^8.22.0"
+  }
+}

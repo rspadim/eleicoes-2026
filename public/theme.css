@@ -1,0 +1,184 @@
+/* Apuração 2026 — tokens de tema (claro/escuro/auto).
+   Carregue DEPOIS de /styles.css. Paletas com contraste AA em texto normal. */
+
+:root,
+:root[data-theme="dark"] {
+  color-scheme: dark;
+
+  --bg: #0b0e14;
+  --bg-elev: #111621;
+  --bg-elev-2: #171d2b;
+  --bg-input: #0e131d;
+
+  --fg: #e9eff7;
+  --fg-muted: #a9b6c7;
+  --fg-faint: #8695a8;
+
+  --line: #263041;
+  --line-strong: #3a465c;
+
+  --accent: #52dd7c;
+  --accent-strong: #2ea44f;
+
+  --live: #ff6b5e;
+  --pos: #4fd57a;
+  --neg: #ff7a6e;
+  --warn: #f0b64b;
+  --danger: #ff7a6e;
+  --focus: #7cb0ff;
+
+  --map-empty: #1e2635;
+  --shadow: 0 10px 30px rgb(0 0 0 / 45%);
+
+  /* aliases compatíveis com styles.css */
+  --text: var(--fg);
+  --text-dim: var(--fg-muted);
+  --text-faint: var(--fg-faint);
+  --border: var(--line);
+  --border-strong: var(--line-strong);
+  --accent-dim: var(--accent-strong);
+}
+
+:root[data-theme="light"] {
+  color-scheme: light;
+
+  --bg: #f5f7fb;
+  --bg-elev: #ffffff;
+  --bg-elev-2: #eaeef6;
+  --bg-input: #ffffff;
+
+  --fg: #101825;
+  --fg-muted: #46536a;
+  --fg-faint: #5f6d84;
+
+  --line: #d5dce8;
+  --line-strong: #b3bfd2;
+
+  --accent: #146c34;
+  --accent-strong: #0f5628;
+
+  --live: #b3261e;
+  --pos: #146c34;
+  --neg: #b3261e;
+  --warn: #8a5a00;
+  --danger: #b3261e;
+  --focus: #0b4fb3;
+
+  --map-empty: #dfe5ef;
+  --shadow: 0 10px 28px rgb(18 28 45 / 14%);
+
+  --text: var(--fg);
+  --text-dim: var(--fg-muted);
+  --text-faint: var(--fg-faint);
+  --border: var(--line);
+  --border-strong: var(--line-strong);
+  --accent-dim: var(--accent-strong);
+}
+
+/* Sem JS / modo auto: segue o sistema operacional. */
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme]),
+  :root[data-theme="auto"] {
+    color-scheme: light;
+
+    --bg: #f5f7fb;
+    --bg-elev: #ffffff;
+    --bg-elev-2: #eaeef6;
+    --bg-input: #ffffff;
+
+    --fg: #101825;
+    --fg-muted: #46536a;
+    --fg-faint: #5f6d84;
+
+    --line: #d5dce8;
+    --line-strong: #b3bfd2;
+
+    --accent: #146c34;
+    --accent-strong: #0f5628;
+
+    --live: #b3261e;
+    --pos: #146c34;
+    --neg: #b3261e;
+    --warn: #8a5a00;
+    --danger: #b3261e;
+    --focus: #0b4fb3;
+
+    --map-empty: #dfe5ef;
+    --shadow: 0 10px 28px rgb(18 28 45 / 14%);
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  :root[data-theme="auto"] {
+    color-scheme: dark;
+
+    --bg: #0b0e14;
+    --bg-elev: #111621;
+    --bg-elev-2: #171d2b;
+    --bg-input: #0e131d;
+
+    --fg: #e9eff7;
+    --fg-muted: #a9b6c7;
+    --fg-faint: #8695a8;
+
+    --line: #263041;
+    --line-strong: #3a465c;
+
+    --accent: #52dd7c;
+    --accent-strong: #2ea44f;
+
+    --live: #ff6b5e;
+    --pos: #4fd57a;
+    --neg: #ff7a6e;
+    --warn: #f0b64b;
+    --danger: #ff7a6e;
+    --focus: #7cb0ff;
+
+    --map-empty: #1e2635;
+    --shadow: 0 10px 30px rgb(0 0 0 / 45%);
+  }
+}
+
+/* Ajustes de contraste em superfícies elevadas e estados de foco. */
+:root[data-theme="light"] ::selection { background: #b9d4ff; color: #0b1220; }
+:root[data-theme="dark"] ::selection { background: #2b4d7a; color: #f2f7ff; }
+
+:root[data-theme="light"] .hint,
+:root[data-theme="light"] .kpi-sub,
+:root[data-theme="light"] .source { color: var(--fg-muted); }
+
+:root[data-theme="dark"] .hint,
+:root[data-theme="dark"] .kpi-sub,
+:root[data-theme="dark"] .source { color: var(--fg-muted); }
+
+:where(button, a, select, input, [tabindex]):focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+
+/* Indicador AO VIVO e variações de resultado. */
+.live-dot,
+.status-dot[data-state="live"] { background: var(--live); }
+.pos, .up { color: var(--pos); }
+.neg, .down { color: var(--neg); }
+.map-empty, .map [data-empty="true"] { fill: var(--map-empty); }
+
+/* Troca de tema suave, respeitando quem prefere menos movimento. */
+@media (prefers-reduced-motion: no-preference) {
+  html { transition: background-color 180ms ease, color 180ms ease; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html,
+  body,
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+  }
+
+  .live-dot { animation: none !important; }
+}

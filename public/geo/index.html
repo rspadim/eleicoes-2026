@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <script>
+    // Aplica o tema antes da primeira pintura (evita flash). Espelha lib/theme.js.
+    try {
+      var m = localStorage.getItem('theme');
+      if (m !== 'light' && m !== 'dark' && m !== 'auto') m = 'auto';
+      var d = m === 'auto' ? (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : m;
+      document.documentElement.dataset.theme = d;
+      document.documentElement.dataset.themeMode = m;
+    } catch (e) { /* sem armazenamento */ }
+  </script>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark light">
+  <meta name="description" content="Acompanhamento em tempo real da apuração das eleições 2026 para presidente, com mapa por estado, mercados e replay. Fonte: TSE.">
+  <title>Apuração 2026 · Presidente</title>
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="/theme.css">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230d1117'/%3E%3Ctext x='16' y='22' text-anchor='middle' font-family='sans-serif' font-size='15' font-weight='700' fill='%2346d164'%3EBR%3C/text%3E%3C/svg%3E">
+  <script type="module">
+    import { applyThemeEarly } from '/src/web/lib/theme.js';
+    applyThemeEarly();
+  </script>
+</head>
+<body>
+  <a class="skip-link" href="#main" data-i18n="app.skip_link">Ir para os dados</a>
+
+  <div id="conn-banner" class="conn-banner" role="status" aria-live="polite" hidden>
+    <span class="conn-dot" aria-hidden="true"></span>
+    <p id="conn-text" data-i18n="conn.lost">Conexão perdida. Tentando reconectar…</p>
+    <button type="button" id="btn-retry" class="btn btn-ghost btn-sm" data-i18n="conn.retry">Tentar agora</button>
+  </div>
+
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true">BR</span>
+      <div class="brand-text">
+        <h1>Apuração 2026 · Presidente</h1>
+        <p class="source">
+          <span class="source-label">Fonte: TSE · dados oficiais ·</span>
+          <a href="https://resultados.tse.jus.br" target="_blank" rel="noopener noreferrer">resultados.tse.jus.br</a>
+        </p>
+      </div>
+    </div>
+
+    <div class="topbar-actions">
+      <span id="status" class="status" data-state="connecting" role="status" aria-live="polite">
+        <span class="status-dot" aria-hidden="true"></span>
+        <span id="status-text">Conectando</span>
+      </span>
+      <time id="clock" class="clock" aria-label="Horário de Brasília">--:--:-- BRT</time>
+      <select id="lang-select" class="select lang-select" aria-label="Idioma">
+        <option value="pt-BR">PT</option>
+        <option value="en">EN</option>
+        <option value="es">ES</option>
+      </select>
+      <button type="button" id="theme-toggle" class="icon-btn" aria-label="Alternar tema claro e escuro" aria-pressed="false" title="Alternar tema">
+        <span class="theme-icon" aria-hidden="true">◐</span>
+      </button>
+      <button type="button" id="btn-live" class="btn btn-live" aria-pressed="true" title="Voltar para o ao vivo">
+        <span class="live-dot" aria-hidden="true"></span>
+        <span id="btn-live-label">AO VIVO</span>
+      </button>
+    </div>
+  </header>
+
+  <section id="kpis" class="kpis" aria-label="Indicadores da apuração">
+    <div class="kpi">
+      <span class="kpi-label" id="kpi-sections-label">Seções apuradas</span>
+      <strong id="kpi-sections" class="kpi-value">—</strong>
+      <span id="kpi-sections-sub" class="kpi-sub">aguardando dados</span>
+    </div>
+    <div class="kpi">
+      <span class="kpi-label" id="kpi-votes-label">Votos válidos</span>
+      <strong id="kpi-votes" class="kpi-value">—</strong>
+      <span id="kpi-votes-sub" class="kpi-sub">total apurado</span>
+    </div>
+    <div class="kpi">
+      <span class="kpi-label" id="kpi-ufs-label">Estados apurados</span>
+      <strong id="kpi-ufs" class="kpi-value">—</strong>
+      <span id="kpi-ufs-sub" class="kpi-sub">de 27 unidades</span>
+    </div>
+    <div class="kpi">
+      <span class="kpi-label" id="kpi-updated-label">Última atualização</span>
+      <strong id="kpi-updated" class="kpi-value kpi-value-sm">—</strong>
+      <span class="kpi-sub" id="kpi-updated-sub">horário de Brasília</span>
+    </div>
+  </section>
+
+  <p id="partial-warning" class="partial" role="note" hidden>
+    Dados parciais: a apuração ainda está em andamento. Os percentuais podem mudar a cada atualização.
+  </p>
+
+  <main id="main" class="layout">
+    <section class="map-card" aria-labelledby="map-title">
+      <div class="card-head">
+        <div>
+          <h2 id="map-title">Mapa por estado</h2>
+          <p class="hint">Clique em um estado para ver os detalhes da apuração local.</p>
+        </div>
+        <div id="legend" class="legend" aria-label="Legenda de candidatos"></div>
+      </div>
+      <div id="map" class="map" role="application" aria-label="Mapa interativo do Brasil por estado"></div>
+    </section>
+
+    <aside class="side" aria-label="Detalhes e mercados">
+      <section class="card" id="bars-card" aria-labelledby="bars-title">
+        <div class="card-head">
+          <h2 id="bars-title">Votos por candidato</h2>
+          <p class="hint">Percentual sobre votos válidos.</p>
+        </div>
+        <div id="bars" class="card-body"></div>
+      </section>
+
+      <section class="card" id="states-card" aria-labelledby="states-title">
+        <div class="card-head">
+          <h2 id="states-title">Estados</h2>
+          <p class="hint">Ordenável por coluna.</p>
+        </div>
+        <div id="states" class="card-body"></div>
+      </section>
+
+      <section class="card" id="markets-card" aria-labelledby="markets-title">
+        <div class="card-head">
+          <h2 id="markets-title">Mercados</h2>
+          <p class="hint">Probabilidade implícita de vitória.</p>
+        </div>
+        <div id="markets" class="card-body"></div>
+      </section>
+    </aside>
+  </main>
+
+  <footer class="replay" aria-label="Controles de replay">
+    <div class="replay-track">
+      <div id="timeline" class="timeline-wrap"></div>
+      <div id="footer-controls" class="replay-controls">
+        <button type="button" id="btn-play" class="btn btn-ghost btn-sm" aria-label="Reproduzir gravação">
+          <span aria-hidden="true">▶</span><span id="btn-play-label">Reproduzir</span>
+        </button>
+        <button type="button" id="btn-pause" class="btn btn-ghost btn-sm" aria-label="Pausar reprodução" disabled>
+          <span aria-hidden="true">⏸</span><span id="btn-pause-label">Pausar</span>
+        </button>
+        <label class="speed-label" id="speed-label" for="speed">Velocidade</label>
+        <select id="speed" class="select" aria-label="Velocidade do replay">
+          <option value="1">1×</option>
+          <option value="2">2×</option>
+          <option value="5">5×</option>
+          <option value="10">10×</option>
+          <option value="30">30×</option>
+        </select>
+        <span id="replay-time" class="replay-time">ao vivo</span>
+      </div>
+      <output id="footer-replay-time" class="sr-only" aria-live="polite" hidden></output>
+    </div>
+  </footer>
+
+  <aside id="panel" class="panel" aria-labelledby="panel-title" aria-hidden="true" hidden>
+    <div class="panel-head">
+      <div>
+        <p class="panel-kicker">Detalhe do estado</p>
+        <h2 id="panel-title">—</h2>
+      </div>
+      <button type="button" class="close" id="panel-close" aria-label="Fechar painel de detalhes"><span aria-hidden="true">×</span></button>
+    </div>
+    <div id="panel-body" class="panel-body"></div>
+  </aside>
+
+  <noscript>
+    <div class="noscript">
+      <strong>JavaScript desativado.</strong>
+      Ative o JavaScript para acompanhar a apuração em tempo real, o mapa e o replay.
+      Você ainda pode consultar os dados oficiais em
+      <a href="https://resultados.tse.jus.br" target="_blank" rel="noopener noreferrer">resultados.tse.jus.br</a>.
+    </div>
+  </noscript>
+
+  <script type="module" src="/src/web/app.js"></script>
+</body>
+</html>

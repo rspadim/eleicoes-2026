@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark light">
+  <meta name="description" content="Votação no exterior na apuração 2026 para presidente: mapa-múndi por país e comparativo com o Brasil. Fonte: TSE.">
+  <title>Voto no exterior · Apuração 2026</title>
+  <link rel="stylesheet" href="/theme.css">
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="/src/web/exterior.css">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230d1117'/%3E%3Ctext x='16' y='22' text-anchor='middle' font-family='sans-serif' font-size='15' font-weight='700' fill='%2346d164'%3EBR%3C/text%3E%3C/svg%3E">
+  <script type="module">
+    try {
+      const { applyThemeEarly } = await import('/src/web/lib/theme.js');
+      applyThemeEarly();
+    } catch { /* tema opcional */ }
+  </script>
+</head>
+<body class="ext-body">
+  <a class="skip-link" href="#ext-main" data-i18n="app.skip_link">Ir para os dados</a>
+
+  <div id="ext-banner" class="conn-banner" role="status" aria-live="polite" hidden>
+    <span class="conn-dot" aria-hidden="true"></span>
+    <p id="ext-banner-text" data-i18n="conn.lost">Conexão perdida. Tentando reconectar…</p>
+    <button type="button" id="ext-retry" class="btn btn-ghost btn-sm" data-i18n="conn.retry">Tentar agora</button>
+  </div>
+
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true">BR</span>
+      <div class="brand-text">
+        <h1 data-i18n="ext.title">Voto no exterior</h1>
+        <p class="source">
+          <span class="source-label" data-i18n="footer.source">Fonte: TSE · dados oficiais</span>
+          <a href="https://resultados.tse.jus.br" target="_blank" rel="noopener noreferrer">resultados.tse.jus.br</a>
+        </p>
+      </div>
+    </div>
+
+    <div class="topbar-actions">
+      <span id="ext-status" class="status" data-state="connecting" role="status" aria-live="polite">
+        <span class="status-dot" aria-hidden="true"></span>
+        <span id="ext-status-text" data-i18n="conn.connecting">Conectando</span>
+      </span>
+      <time id="ext-clock" class="clock" aria-label="Horário de Brasília">--:--:-- BRT</time>
+      <select id="ext-lang" class="select lang-select" aria-label="Idioma" data-i18n-aria="app.lang_aria">
+        <option value="pt-BR">PT</option>
+        <option value="en">EN</option>
+        <option value="es">ES</option>
+      </select>
+      <button type="button" id="ext-theme" class="icon-btn" aria-label="Alternar tema" data-i18n-aria="app.theme_toggle" aria-pressed="false" title="Alternar tema">
+        <span class="theme-icon" aria-hidden="true">◐</span>
+      </button>
+      <a class="btn btn-ghost btn-sm" href="/" data-i18n="ext.back">Voltar ao mapa do Brasil</a>
+    </div>
+  </header>
+
+  <main id="ext-main" class="ext-main">
+    <p id="ext-limitation" class="ext-notice" role="note" data-i18n="ext.limitation">
+      O TSE publica votos por posto consular, não por país. Os países são agregados localmente e o detalhamento pode ficar incompleto.
+    </p>
+
+    <div id="ext-partial" class="ext-notice ext-notice-warn" role="status" hidden data-i18n="warn.partial">
+      Dados parciais: a apuração ainda está em andamento. Os percentuais podem mudar a cada atualização.
+    </div>
+
+    <section class="ext-kpis" aria-label="Indicadores do exterior">
+      <div class="kpi">
+        <span class="kpi-label" data-i18n="ext.kpi_votes">Votos no exterior</span>
+        <strong id="ext-votes" class="kpi-value">—</strong>
+        <span class="kpi-sub" data-i18n="ext.kpi_votes_sub">votos válidos apurados</span>
+      </div>
+      <div class="kpi">
+        <span class="kpi-label" data-i18n="ext.kpi_pct">% apurado exterior</span>
+        <strong id="ext-pct" class="kpi-value">—</strong>
+        <span id="ext-pct-sub" class="kpi-sub">—</span>
+      </div>
+      <div class="kpi">
+        <span class="kpi-label" data-i18n="ext.kpi_posts">Postos consulares</span>
+        <strong id="ext-posts" class="kpi-value">—</strong>
+        <span class="kpi-sub" data-i18n="ext.kpi_posts_sub">com seção apurada</span>
+      </div>
+      <div class="kpi">
+        <span class="kpi-label" data-i18n="ext.kpi_updated">Última atualização</span>
+        <strong id="ext-updated" class="kpi-value">—</strong>
+        <span class="kpi-sub" data-i18n="kpi.updated_sub">horário de Brasília</span>
+      </div>
+    </section>
+
+    <section id="ext-compare" class="ext-card" aria-labelledby="ext-compare-title">
+      <h2 id="ext-compare-title" data-i18n="ext.compare_title">Exterior × Brasil</h2>
+      <p class="ext-hint" data-i18n="ext.compare_hint">Comparação direta entre o comparecimento no exterior e no Brasil.</p>
+      <div id="ext-compare-body" class="ext-compare">
+        <p class="ext-empty" data-i18n="ext.awaiting">Aguardando os primeiros dados do exterior.</p>
+      </div>
+      <p id="ext-compare-foot" class="ext-hint ext-foot">—</p>
+    </section>
+
+    <section class="ext-card" aria-labelledby="ext-map-title">
+      <h2 id="ext-map-title" data-i18n="ext.map_title">Mapa-múndi</h2>
+      <p class="ext-hint" data-i18n="ext.map_hint">Bolhas proporcionais aos votos válidos por país. Países sem dado ficam neutros.</p>
+      <div class="ext-map-wrap">
+        <svg id="ext-map" class="ext-map" viewBox="0 0 1000 708" role="img" aria-labelledby="ext-map-title" preserveAspectRatio="xMidYMid meet">
+          <g id="ext-map-countries" class="ext-map-countries"></g>
+          <g id="ext-map-bubbles" class="ext-map-bubbles"></g>
+        </svg>
+        <div id="ext-tip" class="ext-tip" role="tooltip" hidden></div>
+      </div>
+      <ul id="ext-legend" class="ext-legend" aria-label="Legenda"></ul>
+    </section>
+
+    <div class="ext-grid">
+      <section class="ext-card" aria-labelledby="ext-ranking-title">
+        <h2 id="ext-ranking-title" data-i18n="ext.ranking_title">Ranking por país</h2>
+        <p class="ext-hint" data-i18n="ext.ranking_hint">Ordenado por votos válidos no exterior.</p>
+        <ol id="ext-ranking" class="ext-ranking">
+          <li class="ext-empty" data-i18n="ext.awaiting">Aguardando os primeiros dados do exterior.</li>
+        </ol>
+      </section>
+
+      <section class="ext-card" aria-labelledby="ext-table-title">
+        <h2 id="ext-table-title" data-i18n="ext.table_title">País a país</h2>
+        <p class="ext-hint" data-i18n="ext.table_hint">Seções apuradas, votos válidos e liderança.</p>
+        <div class="ext-table-wrap">
+          <table class="ext-table">
+            <thead>
+              <tr>
+                <th scope="col" data-i18n="ext.col_country">País</th>
+                <th scope="col" class="num" data-i18n="ext.col_pct">Apurado</th>
+                <th scope="col" class="num" data-i18n="ext.col_votes">Válidos</th>
+                <th scope="col" data-i18n="ext.col_leader">Líder</th>
+              </tr>
+            </thead>
+            <tbody id="ext-table-body">
+              <tr><td colspan="4" class="ext-empty" data-i18n="ext.awaiting">Aguardando os primeiros dados do exterior.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+
+    <section class="ext-card" aria-labelledby="ext-posts-title">
+      <h2 id="ext-posts-title" data-i18n="ext.posts_title">Postos consulares</h2>
+      <p class="ext-hint" data-i18n="ext.posts_hint">Detalhe oficial do TSE por posto, base da agregação por país.</p>
+      <div class="ext-table-wrap ext-posts-wrap">
+        <table class="ext-table">
+          <thead>
+            <tr>
+              <th scope="col" data-i18n="ext.col_post">Posto</th>
+              <th scope="col" class="num" data-i18n="ext.col_pct">Apurado</th>
+              <th scope="col" class="num" data-i18n="ext.col_sections">Seções</th>
+              <th scope="col" class="num" data-i18n="ext.col_votes">Válidos</th>
+            </tr>
+          </thead>
+          <tbody id="ext-posts-body">
+            <tr><td colspan="4" class="ext-empty" data-i18n="ext.awaiting">Aguardando os primeiros dados do exterior.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <p class="ext-hint ext-foot" data-i18n="footer.disclaimer">Apuração independente a partir dos dados públicos do TSE.</p>
+  </main>
+
+  <noscript>
+    <p class="ext-notice" data-i18n="noscript.body">Ative o JavaScript para acompanhar a apuração em tempo real, o mapa e o replay.</p>
+  </noscript>
+
+  <script type="module" src="/src/web/exterior.js"></script>
+</body>
+</html>

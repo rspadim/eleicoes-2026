@@ -1,0 +1,328 @@
+/* Página do voto no exterior: mapa-múndi, comparativo e tabelas. */
+
+.ext-body { --ext-bubble: #58a6ff; }
+
+.ext-main {
+  display: grid;
+  gap: 16px;
+  padding: 16px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.ext-notice {
+  margin: 0;
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: 1px solid var(--border, #30363d);
+  background: var(--bg-elev-2, #161b22);
+  color: var(--fg-muted, #9aa4b2);
+  font-size: 0.86rem;
+  line-height: 1.45;
+}
+
+.ext-notice-warn {
+  border-color: #9e6a03;
+  background: #2b2111;
+  color: #e3b341;
+}
+
+.ext-kpis {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+}
+
+.ext-card {
+  border: 1px solid var(--border, #30363d);
+  border-radius: 12px;
+  background: var(--bg-elev, #0d1117);
+  padding: 14px;
+  min-width: 0;
+}
+
+.ext-card h2 {
+  margin: 0 0 4px;
+  font-size: 0.95rem;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--fg-muted, #9aa4b2);
+}
+
+.ext-hint {
+  margin: 0 0 10px;
+  font-size: 0.8rem;
+  color: var(--fg-muted, #9aa4b2);
+}
+
+.ext-foot { margin: 6px 0 0; }
+
+.ext-grid {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.6fr);
+}
+
+@media (max-width: 900px) {
+  .ext-grid { grid-template-columns: minmax(0, 1fr); }
+}
+
+/* Mapa */
+
+.ext-map-wrap {
+  position: relative;
+  border-radius: 10px;
+  overflow: hidden;
+  background: linear-gradient(180deg, #0b1b2b, #0a1220 70%);
+  border: 1px solid var(--border, #21262d);
+}
+
+.ext-map { display: block; width: 100%; height: auto; }
+
+.ext-map-countries path {
+  fill: #1b2733;
+  stroke: #2c3b4b;
+  stroke-width: 0.7;
+  vector-effect: non-scaling-stroke;
+}
+
+.ext-map-countries path.ext-br {
+  fill: #123321;
+  stroke: #2ea043;
+  stroke-width: 1;
+}
+
+.ext-map-countries path.ext-active {
+  fill: #1f3b57;
+}
+
+.ext-map-bubbles circle.ext-bubble {
+  fill: var(--ext-bubble);
+  fill-opacity: 0.55;
+  stroke: #cfe6ff;
+  stroke-width: 0.8;
+  vector-effect: non-scaling-stroke;
+  cursor: pointer;
+  transition: fill-opacity 120ms ease;
+}
+
+.ext-map-bubbles circle:hover,
+.ext-map-bubbles circle:focus-visible {
+  fill-opacity: 0.85;
+  outline: none;
+}
+
+.ext-map-bubbles circle.ext-selected {
+  stroke: #ffffff;
+  stroke-width: 2;
+  fill-opacity: 0.9;
+}
+
+.ext-tip {
+  position: absolute;
+  z-index: 3;
+  pointer-events: none;
+  transform: translate(-50%, -130%);
+  background: #0d1117f2;
+  border: 1px solid #30363d;
+  border-radius: 8px;
+  padding: 6px 9px;
+  font-size: 0.78rem;
+  line-height: 1.35;
+  color: #e6edf3;
+  box-shadow: 0 6px 18px #0008;
+  white-space: nowrap;
+}
+
+.ext-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  list-style: none;
+  margin: 10px 0 0;
+  padding: 0;
+  font-size: 0.76rem;
+  color: var(--fg-muted, #9aa4b2);
+}
+
+.ext-legend li { display: flex; align-items: center; gap: 6px; }
+
+.ext-legend .dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--ext-bubble);
+  opacity: 0.6;
+}
+
+.ext-empty {
+  color: var(--fg-muted, #9aa4b2);
+  font-size: 0.85rem;
+  padding: 8px 0;
+}
+
+/* Comparativo */
+
+.ext-compare { display: grid; gap: 12px; }
+
+.ext-cmp-row {
+  display: grid;
+  gap: 4px;
+}
+
+.ext-cmp-head {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.8rem;
+  color: var(--fg-muted, #9aa4b2);
+}
+
+.ext-cmp-bar {
+  height: 12px;
+  border-radius: 999px;
+  background: #1b2733;
+  overflow: hidden;
+}
+
+.ext-cmp-bar > span {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #2f81f7, #58a6ff);
+}
+
+.ext-cmp-bar.ext-br > span { background: linear-gradient(90deg, #238636, #3fb950); }
+
+.ext-cmp-note {
+  font-size: 0.76rem;
+  color: var(--fg-muted, #9aa4b2);
+  margin: 0;
+}
+
+/* Ranking */
+
+.ext-ranking {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 6px;
+}
+
+.ext-ranking button {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1.4rem 1fr auto;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: #11181f;
+  color: inherit;
+  padding: 6px 8px;
+  font: inherit;
+  font-size: 0.84rem;
+  text-align: left;
+  cursor: pointer;
+}
+
+.ext-ranking button:hover { border-color: #2f81f7; }
+
+.ext-ranking button[aria-pressed='true'] {
+  border-color: #58a6ff;
+  background: #16273a;
+}
+
+.ext-ranking .pos { color: var(--fg-muted, #9aa4b2); font-variant-numeric: tabular-nums; }
+.ext-ranking .votes { font-variant-numeric: tabular-nums; color: #d6e2ee; }
+
+/* Tabelas */
+
+.ext-table-wrap { overflow-x: auto; }
+
+.ext-table-wrap.ext-posts-wrap { max-height: 420px; overflow-y: auto; }
+
+.ext-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.84rem;
+}
+
+.ext-table th,
+.ext-table td {
+  padding: 6px 8px;
+  border-bottom: 1px solid #1e2630;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.ext-table th {
+  position: sticky;
+  top: 0;
+  background: var(--bg-elev, #0d1117);
+  color: var(--fg-muted, #9aa4b2);
+  font-weight: 600;
+  font-size: 0.76rem;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.ext-table .num { text-align: right; font-variant-numeric: tabular-nums; }
+.ext-table tbody tr:hover { background: #11181f; }
+.ext-table tbody tr.ext-active { background: #16273a; }
+
+.ext-cand {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.ext-cand i {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.ext-pct-cell {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  justify-content: flex-end;
+}
+
+.ext-pct-cell .mini {
+  width: 54px;
+  height: 5px;
+  border-radius: 999px;
+  background: #1b2733;
+  overflow: hidden;
+}
+
+.ext-pct-cell .mini > span {
+  display: block;
+  height: 100%;
+  background: #2f81f7;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ext-map-bubbles circle { transition: none; }
+}
+
+/* Tema claro: as superfícies internas têm hex próprios no bloco escuro. */
+:root[data-theme='light'] .ext-map-wrap { background: linear-gradient(180deg, #dbeafe, #eff6ff 70%); }
+:root[data-theme='light'] .ext-map-countries path { fill: #e8eef5; stroke: #c3ced9; }
+:root[data-theme='light'] .ext-map-countries path.ext-active { fill: #bfd8f5; }
+:root[data-theme='light'] .ext-map-countries path.ext-br { fill: #d7f0df; stroke: #1f883d; }
+:root[data-theme='light'] .ext-map-bubbles circle.ext-bubble { stroke: #0b5cad; }
+:root[data-theme='light'] .ext-tip { background: #fffffff2; border-color: #c3ced9; color: #14202b; box-shadow: 0 6px 18px #0002; }
+:root[data-theme='light'] .ext-cmp-bar,
+:root[data-theme='light'] .ext-pct-cell .mini { background: #dde5ee; }
+:root[data-theme='light'] .ext-ranking button { background: #f3f6fa; }
+:root[data-theme='light'] .ext-ranking button[aria-pressed='true'] { background: #dbeafe; border-color: #2f81f7; }
+:root[data-theme='light'] .ext-ranking .votes { color: #14202b; }
+:root[data-theme='light'] .ext-table th,
+:root[data-theme='light'] .ext-table td { border-bottom-color: #e2e8f0; }
+:root[data-theme='light'] .ext-table tbody tr:hover { background: #f3f6fa; }
+:root[data-theme='light'] .ext-table tbody tr.ext-active { background: #dbeafe; }
+:root[data-theme='light'] .ext-notice-warn { border-color: #d4a72c; background: #fff8e1; color: #7a4d00; }
