@@ -98,9 +98,14 @@ export function createMovement(el, { onSelect } = {}) {
 
     if (from && to) {
       const mins = dados?.windowMs ? Math.round(dados.windowMs / 60_000) : null;
-      resumo.textContent = mins
-        ? `Variação do líder de cada estado entre ${from} e ${to} (janela de ${mins} min).`
-        : `Variação do líder de cada estado entre ${from} e ${to}.`;
+      const realmente = from === to
+        ? 'sem leitura anterior nesta janela'
+        : mins
+          ? `janela de ${mins} min`
+          : null;
+      resumo.textContent = realmente && realmente.startsWith('sem')
+        ? `Ainda não há leitura anterior suficiente para comparar (${realmente}).`
+        : `Variação do líder de cada estado entre ${from} e ${to}${realmente ? ` (${realmente})` : ''}.`;
     } else {
       resumo.textContent = 'Ainda não há duas leituras suficientes para comparar.';
     }

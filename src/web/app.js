@@ -570,7 +570,11 @@ async function loadDerived() {
       fetch('/api/movement').then((r) => (r.ok ? r.json() : null)).catch(() => null),
       fetch('/api/evolution').then((r) => (r.ok ? r.json() : null)).catch(() => null),
     ]);
-    if (mov) safeUpdate('movement', mov);
+    if (mov) {
+      safeUpdate('movement', mov);
+      const linhas = [...(mov.rows ?? []), ...(mov.up ?? []), ...(mov.down ?? [])];
+      safeCall('map', 'setMovement', linhas);
+    }
     if (evo) safeUpdate('evolution', evo);
   } catch { /* derivados são opcionais */ }
 }

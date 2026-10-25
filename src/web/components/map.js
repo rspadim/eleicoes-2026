@@ -124,10 +124,10 @@ export const LAYERS = [
   { id: 'progress', label: 'Apuração', hint: 'Quanto maior o % de seções apuradas, mais clara a UF.' },
 ];
 
-function escalaSequencial(pct) {
-  const n = Math.max(0, Math.min(100, Number(pct) || 0));
+function escalaSequencial(pct, max = 100) {
+  const n = Math.max(0, Math.min(max, Number(pct) || 0));
   // rampa azul-escuro -> azul-claro legível nos dois temas
-  const t = n / 100;
+  const t = n / max;
   const r = Math.round(30 + t * 100);
   const g = Math.round(80 + t * 110);
   const b = Math.round(170 + t * 70);
@@ -144,7 +144,7 @@ function escalaDivergente(delta) {
 }
 
 /** Cor + opacidade de uma UF para a camada ativa. */
-function estiloDaCamada(uf, dados, camada) {
+function estiloDaCamada(uf, dados, camada, movimento) {
   const semDados = !temApuracao(dados);
   const lider = liderDe(dados);
   switch (camada) {
@@ -155,11 +155,14 @@ function estiloDaCamada(uf, dados, camada) {
     }
     case 'change': {
       if (semDados || !lider) return { fill: 'var(--bg-elev-2)', opacity: 1 };
-      return { fill: escalaDivergente(dados?.delta?.leaderPct), opacity: 1 };
+      // Prefere a janela de 10 min (movimento) ao delta do último ciclo.
+      const janela = movimento.get(uf);
+      return { fill: escalaDivergente(janela ?? dados?.delta?.leaderPct), opacity: 1 };
     }
     case 'abstention': {
       if (semDados) return { fill: 'var(--bg-elev-2)', opacity: 1 };
-      return { fill: escalaSequencial(dados?.abstentionPct ?? 0), opacity: 1 };
+      // abstenção realista vai de ~5% a ~35%; normalizar 0-40 dá contraste útil
+      return { fill: escalaSequencial(dados?.abstentionPct ?? 0, 40), opacity: 1 };
     }
     case 'progress': {
       if (semDados) return { fill: 'var(--bg-elev-2)', opacity: 1 };
@@ -211,6 +214,7 @@ export function createMap(el, { onSelect } = {}) {
   let hatchId = '';
   let camada = 'leader';
   let seletorCamadas = null;
+  const movimento = new Map();
 
   let sequencia = 0;
   function idHachura() {
@@ -309,10 +313,12 @@ export function createMap(el, { onSelect } = {}) {
       }
 
       mostrarTrilha(true);
-      minimo.textContent = camada === 'margin' ? '0 p.p.' : '0%';
-      maximo.textContent = camada === 'margin' ? '60 p.p.' : '100%';
+      const teto = camada === 'margin' ? 60 : camada === 'abstention' ? 40 : 100;
+      const unidade = camada === 'margin' ? ' p.p.' : '%';
+      minimo.textContent = `0${unidade}`;
+      maximo.textContent = `${teto}${unidade}`;
       for (let passo = 0; passo <= 4; passo += 1) {
-        amostras.appendChild(amostra(escalaSequencial((passo / 4) * 100)));
+        amostras.appendChild(amostra(escalaSequencial((passo / 4) * teto, teto)));
       }
     }
 
@@ -414,7 +420,7 @@ export function createMap(el, { onSelect } = {}) {
     const comDados = temApuracao(dados);
     const lider = liderDe(dados);
 
-    const estilo = estiloDaCamada(uf, dados, camada);
+    const estilo = estiloDaCamada(uf, dados, camada, movimento);
     path.style.fill = estilo.fill;
     path.style.fillOpacity = String(estilo.opacity);
     if (comDados) path.removeAttribute('data-empty');
@@ -715,6 +721,17 @@ export function createMap(el, { onSelect } = {}) {
       }
       legendaEscala?._repintar?.();
       render();
+    },
+
+    /** Alimenta a camada "Mudança" com a variação da janela (10 min). */
+    setMovement(linhas) {
+      if (!Array.isArray(linhas)) return;
+      movimento.clear();
+      for (const linha of linhas) {
+        const uf = normalizar(linha?.uf);
+        if (uf) movimento.set(uf, Number(linha?.deltaPct) || 0);
+      }
+      if (camada === 'change') render();
     },
 
     // usado pelo app quando o usuário clica em uma barra de candidato

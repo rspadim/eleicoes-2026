@@ -836,3 +836,6 @@ html[data-theme="light"] .brand-mark { background: #16202d; }
   font-size: 0.72rem; color: var(--text-dim); cursor: pointer;
 }
 .market-filter-label input { accent-color: var(--accent); }
+
+.source .sep { opacity: 0.5; margin: 0 2px; }
+.source .link-exterior { color: var(--accent); }

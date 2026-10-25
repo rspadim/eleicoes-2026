@@ -60,7 +60,7 @@ export function fmtTimeAgo(ts, now = Date.now()) {
 
 /** Relógio HH:MM:SS em America/Sao_Paulo. */
 export function fmtClock(date = new Date()) {
-  const d = date instanceof Date ? date : new Date(toNumber(date) || Date.now());
+  const d = paraData(date);
   try {
     return clockFmt.format(d);
   } catch {
@@ -70,12 +70,23 @@ export function fmtClock(date = new Date()) {
 
 /** HH:MM em Brasília — usado no replay. */
 export function fmtShortClock(ts) {
-  const d = ts instanceof Date ? ts : new Date(toNumber(ts) || Date.now());
+  const d = paraData(ts);
   try {
     return shortClockFmt.format(d);
   } catch {
     return '--:--';
   }
+}
+
+/** Aceita Date, epoch ms ou ISO; inválido vira "agora". */
+function paraData(valor) {
+  if (valor instanceof Date) return valor;
+  if (typeof valor === 'string') {
+    const parsed = Date.parse(valor);
+    if (Number.isFinite(parsed)) return new Date(parsed);
+  }
+  const n = Number(valor);
+  return new Date(Number.isFinite(n) && n > 0 ? n : Date.now());
 }
 
 const ESCAPES = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
