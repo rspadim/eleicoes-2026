@@ -98,3 +98,26 @@ npm test
 - Projeto independente, sem vínculo com o TSE.
 - Probabilidade de mercado é implícita e não substitui pesquisa.
 - Números parciais aparecem marcados como parciais sempre que `pct < 100`.
+
+## Deploy
+
+Imagem única (Node 24 + SQLite), serve API, WebSocket e o front:
+
+```bash
+docker compose up -d --build     # http://localhost:10000
+```
+
+O volume `./data` guarda o SQLite e, se você rodar `node scripts/capture-raw.mjs`, os JSON crus.
+Em produção, mantenha o `capture-raw` ativo num segundo container/processo para nunca perder a
+janela de apuração.
+
+## Estrutura de dados
+
+| Tabela | Conteúdo |
+| --- | --- |
+| `snapshot` | estado normalizado + hash (imutável) por instante |
+| `change` | delta de votos por UF/candidato |
+| `market` | série de probabilidades Polymarket/Kalshi |
+
+`GET /api/evolution` devolve a série leve para o gráfico; `GET /api/movement?window=600000`
+devolve o ranking de quem subiu/caiu no período.

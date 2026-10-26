@@ -156,5 +156,6 @@
   "app.status_replay_paused": "Replay pausado",
   "app.partial_age": "Dados parciais: {pct} das seções apuradas · {age} · atualização automática a cada 20 s.",
   "age.just_now": "agora mesmo",
-  "kpi.ufs_sub_progress": "{started} com apuração iniciada · {done} concluídas"
+  "kpi.ufs_sub_progress": "{started} com apuração iniciada · {done} concluídas",
+  "kpi.ufs_sub_progress_one": "{started} com apuração iniciada · {done} concluída"
 }

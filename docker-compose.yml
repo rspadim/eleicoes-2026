@@ -1,0 +1,16 @@
+services:
+  eleicoes:
+    build: .
+    container_name: eleicoes-2026
+    restart: unless-stopped
+    ports:
+      # 10000 é a porta que o contabo-personal usa hoje
+      - "10000:8787"
+    environment:
+      PORT: 8787
+      TSE_ROUND: 2t
+      POLL_INTERVAL_MS: 20000
+      MARKET_INTERVAL_MS: 60000
+      DB_PATH: /data/apuracao.db
+    volumes:
+      - ./data:/data

@@ -255,7 +255,11 @@ function renderKpis(state) {
   const pct = Number.isFinite(totalsPct) ? totalsPct : sectionsPct;
   const ufs = state?.ufs ? Object.values(state.ufs) : [];
   const comDados = ufs.filter((u) => (Number(u?.countedSections) || 0) > 0).length;
-  const concluidas = ufs.filter((u) => (Number(u?.pct) || 0) >= 100).length;
+  const concluidas = ufs.filter((u) => {
+    const contadas = Number(u?.countedSections) || 0;
+    const total = Number(u?.totalSections) || 0;
+    return total > 0 && contadas >= total;
+  }).length;
 
   const national = state?.national ?? {};
   const votes = national.totalVotes ?? Object.values(national.votes ?? {}).reduce((a, b) => a + (Number(b) || 0), 0);
@@ -272,11 +276,10 @@ function renderKpis(state) {
   }
   if (els.kpiUfs) els.kpiUfs.textContent = `${concluidas} / ${ufs.length || 27}`;
   if (els.kpiUfsSub) {
-    els.kpiUfsSub.textContent = t('kpi.ufs_sub_progress', {
-      started: comDados,
-      done: concluidas,
-      total: ufs.length || 27,
-    });
+    const vars = { started: comDados, done: concluidas, total: ufs.length || 27 };
+    // pluralização simples: a chave _one existe nos três idiomas
+    const chave = concluidas === 1 ? 'kpi.ufs_sub_progress_one' : 'kpi.ufs_sub_progress';
+    els.kpiUfsSub.textContent = t(chave, vars);
   }
   if (els.kpiUpdated) {
     const ts = toTs(state?.ts);

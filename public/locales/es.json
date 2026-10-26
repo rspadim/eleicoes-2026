@@ -156,5 +156,6 @@
   "app.status_replay_paused": "Repetición en pausa",
   "app.partial_age": "Datos parciales: {pct} de las secciones escrutadas · {age} · actualización automática cada 20 s.",
   "age.just_now": "ahora mismo",
-  "kpi.ufs_sub_progress": "{started} con escrutinio iniciado · {done} terminadas"
+  "kpi.ufs_sub_progress": "{started} con escrutinio iniciado · {done} terminadas",
+  "kpi.ufs_sub_progress_one": "{started} con escrutinio iniciado · {done} terminada"
 }

@@ -156,5 +156,6 @@
   "app.status_replay_paused": "Replay paused",
   "app.partial_age": "Partial data: {pct} of sections counted · {age} · auto-refresh every 20 s.",
   "age.just_now": "just now",
-  "kpi.ufs_sub_progress": "{started} states counting · {done} finished"
+  "kpi.ufs_sub_progress": "{started} states counting · {done} finished",
+  "kpi.ufs_sub_progress_one": "{started} states counting · {done} finished"
 }
