@@ -8,9 +8,20 @@ Sem chat, sem enxame de widgets: dados oficiais, mapa, apuração, histórico.
 
 ```bash
 npm install
-npm run geo        # baixa e gera os mapas (uma vez)
+npm run geo        # gera public/geo (Brasil por UF) uma vez
+npm run world      # gera public/geo/world.json (exterior) uma vez
 npm start          # http://localhost:8787
 ```
+
+Scripts úteis:
+
+| Script | O que faz |
+| --- | --- |
+| `npm run capture` | arquiva o JSON cru do TSE a cada 20 s em `data/raw/<eleicao>/` |
+| `npm run backfill` | reconstrói o SQLite a partir do cru (idempotente) |
+| `npm run backfill:1t` | reconstrói o 1º turno num banco separado |
+| `npm run check` | abre o site no Chrome headless e reporta erros/contagens |
+| `npm test` | 63 testes (normalização, API/WS, geo, i18n, rodadas) |
 
 Captura contínua do JSON cru (recomendado no dia da eleição, em outro terminal):
 

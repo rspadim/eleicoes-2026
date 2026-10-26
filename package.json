@@ -11,6 +11,12 @@
     "start": "node src/server/index.js",
     "dev": "node --watch src/server/index.js",
     "geo": "node scripts/build-geo.mjs",
+    "world": "node scripts/build-world.mjs",
+    "capture": "node scripts/capture-raw.mjs",
+    "backfill": "node scripts/backfill.mjs",
+    "backfill:1t": "node scripts/backfill.mjs --dir data/raw/6257 --db data/apuracao-1t.db",
+    "check": "node scripts/check-page.mjs",
+    "audit": "node scripts/audit-pages.mjs",
     "test": "node --test test/index.js"
   },
   "dependencies": {
