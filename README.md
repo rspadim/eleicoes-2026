@@ -21,8 +21,11 @@ node scripts/capture-raw.mjs
 Depois, para reconstruir o banco a partir do cru:
 
 ```bash
-node scripts/backfill.mjs --round 2t
+node scripts/backfill.mjs --round 2t   # ou sem --round para todas as capturas
 ```
+
+O backfill agrupa as capturas em ciclos de 5 s, monta o estado nacional + 27 UFs
+e grava com hash idempotente — rodar duas vezes não duplica nada.
 
 ## Variáveis
 
