@@ -22,13 +22,17 @@ const arg = (nome, padrao) => {
   return i === -1 ? padrao : args[i + 1];
 };
 
-const dir = arg('dir', 'data/raw');
+const dirBase = arg('dir', 'data/raw');
 const dbPath = arg('db', 'data/apuracao.db');
 const roundArg = arg('round', null);
 const round = roundArg ? getRound(roundArg) : null;
 const eleFiltro = round ? round.ele : null;
 
 const db = openDb(dbPath);
+// data/raw/<ele>/... (formato novo) ou data/raw/... (formato antigo)
+const dir = eleFiltro && (await readdir(dirBase)).includes(eleFiltro)
+  ? `${dirBase}/${eleFiltro}`
+  : dirBase;
 const arquivos = (await readdir(dir)).filter((f) => f.endsWith('.json')).sort();
 
 // nome -> { ts, escopo, arquivo }
@@ -101,28 +105,32 @@ for (const chave of [...ciclos.keys()].sort((a, b) => a - b)) {
     } catch { /* UF inválida no ciclo: ignora */ }
   }
 
-  // Exterior (zz) fica em escopo próprio, como faz o coletor dedicado.
+  // Exterior (zz) fica em escopo próprio. O TSE publica os dois no mesmo ciclo,
+  // então deslocamos 1 ms para respeitar a unicidade de ts.
   const brutoZz = await ler('zz');
   if (brutoZz) {
     try {
-      const { state } = normalize(brutoZz, 'br', null, ts);
+      const tsZz = new Date(Date.parse(ts) + 1).toISOString();
+      const { state } = normalize(brutoZz, 'br', null, tsZz);
       const exterior = { ...state, scope: 'zz', national: undefined };
       const hashZz = hashEstado(exterior);
-      const existeZz = db.prepare('SELECT 1 FROM snapshot WHERE ts = ? AND hash = ? LIMIT 1').get(ts, hashZz);
+      const existeZz = db.prepare('SELECT 1 FROM snapshot WHERE hash = ? LIMIT 1').get(hashZz);
       if (!existeZz) {
         insertSnapshot(db, {
-          ts,
+          ts: tsZz,
           hash: hashZz,
           pct: Number(state.national?.pct) || 0,
           payload: JSON.stringify(exterior),
         });
         porEscopo.zz += 1;
       }
-    } catch { /* exterior opcional */ }
+    } catch (err) {
+      console.warn(`zz ${ts}: ${err.message}`);
+    }
   }
 
   const hash = hashEstado(estado);
-  const jaExiste = db.prepare('SELECT 1 FROM snapshot WHERE ts = ? OR hash = ? LIMIT 1').get(ts, hash);
+  const jaExiste = db.prepare('SELECT 1 FROM snapshot WHERE hash = ? LIMIT 1').get(hash);
   if (jaExiste) { repetidos += 1; continue; }
 
   insertSnapshot(db, {
