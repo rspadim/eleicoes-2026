@@ -4,7 +4,7 @@ import { createHash } from 'node:crypto';
 import { mkdirSync } from 'node:fs';
 import { dirname } from 'node:path';
 import { DB_PATH, MARKETS } from '../shared/config.js';
-import { openDb, insertMarkets, latestMarkets } from './db.js';
+import { openDb, insertMarkets, latestMarkets, marketsAt } from './db.js';
 import bus from './bus.js';
 
 const UA = 'eleicoes-2026/0.1 (+contato)';
@@ -34,11 +34,12 @@ const lastHash = new Map();
 let lastData = { polymarket: [], kalshi: [], ts: null };
 
 /** Ultimas leituras por fonte ja no formato publico (sem `raw`). */
-export function latestMarketRows(store) {
+export function latestMarketRows(store, at = null) {
   const out = {};
   for (const source of ['polymarket', 'kalshi']) {
     try {
-      out[source] = latestMarkets(store, source).map(marketRow);
+      const rows = at ? marketsAt(store, source, at) : latestMarkets(store, source);
+      out[source] = rows.map(marketRow);
     } catch {
       out[source] = [];
     }

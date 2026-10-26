@@ -127,4 +127,17 @@ export function latestMarkets(db, source) {
   return db.prepare(sql).all(source, source);
 }
 
+/**
+ * Mercados como estavam no instante `ts` (ultima leitura de cada entidade ate
+ * aquele momento). Usado para o replay mostrar as odds da epoca, nao as de hoje.
+ */
+export function marketsAt(db, source, ts) {
+  if (!ts) return latestMarkets(db, source);
+  const sql = `SELECT id, ts, source, entity, prob, volume, raw FROM market
+     WHERE source = ? AND ts <= ?
+       AND id IN (SELECT MAX(id) FROM market WHERE source = ? AND ts <= ? GROUP BY entity)
+     ORDER BY entity`;
+  return db.prepare(sql).all(source, ts, source, ts);
+}
+
 export default { openDb };

@@ -1,6 +1,7 @@
 // Replay por cliente: repassa snapshots historicos na cadencia original / speed.
 // Uma sessao por socket; o modo e sempre individual (nunca global).
 import { timeline, snapshotAt, changesSince, previousSnapshot } from './db.js';
+import { latestMarketRows } from './markets.js';
 
 export const DEFAULT_SPEED = 20;
 const MIN_DELAY_MS = 10;
@@ -99,7 +100,8 @@ export class ReplaySession {
   play(row) {
     if (!this.active) return;
     const gap = this.nextGap(row.ts);
-    this.send({ type: 'snapshot', state: parse(row), changes: this.changesFor(row.ts), ts: row.ts });
+    const markets = latestMarketRows(this.db, row.ts);
+    this.send({ type: 'snapshot', state: parse(row), changes: this.changesFor(row.ts), ts: row.ts, markets });
     if (gap === null) {
       this.finished = true;
       this.active = false;

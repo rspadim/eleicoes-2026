@@ -124,6 +124,20 @@ export const LAYERS = [
   { id: 'progress', label: 'Apuração', hint: 'Quanto maior o % de seções apuradas, mais clara a UF.' },
 ];
 
+const CAMADA_KEY = 'mapa:camada';
+
+function lerCamada() {
+  try {
+    const salva = localStorage.getItem(CAMADA_KEY);
+    if (LAYERS.some((l) => l.id === salva)) return salva;
+  } catch { /* armazenamento indisponível */ }
+  return 'leader';
+}
+
+function salvarCamada(id) {
+  try { localStorage.setItem(CAMADA_KEY, id); } catch { /* ignora */ }
+}
+
 function escalaSequencial(pct, max = 100) {
   const n = Math.max(0, Math.min(max, Number(pct) || 0));
   // rampa azul-escuro -> azul-claro legível nos dois temas
@@ -212,7 +226,7 @@ export function createMap(el, { onSelect } = {}) {
   const timers = new Map();
   let avisoEstado = null;
   let hatchId = '';
-  let camada = 'leader';
+  let camada = lerCamada();
   let seletorCamadas = null;
   const movimento = new Map();
 
@@ -344,6 +358,7 @@ export function createMap(el, { onSelect } = {}) {
       botao.setAttribute('aria-selected', String(def.id === camada));
       botao.addEventListener('click', () => {
         camada = def.id;
+        salvarCamada(camada);
         for (const outro of caixa.querySelectorAll('.map-layer-btn')) {
           outro.setAttribute('aria-selected', String(outro.dataset.layer === camada));
         }
@@ -716,6 +731,7 @@ export function createMap(el, { onSelect } = {}) {
     setLayer(novo) {
       if (!LAYERS.some((l) => l.id === novo)) return;
       camada = novo;
+      salvarCamada(camada);
       for (const botao of seletorCamadas?.querySelectorAll('.map-layer-btn') ?? []) {
         botao.setAttribute('aria-selected', String(botao.dataset.layer === camada));
       }

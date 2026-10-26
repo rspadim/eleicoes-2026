@@ -90,7 +90,9 @@ export function createMovement({ db } = {}) {
         ? Math.min(MAX_WINDOW_MS, Math.max(60_000, requested))
         : DEFAULT_WINDOW_MS;
 
-      const latestRow = latestSnapshot(db);
+      // `at` permite ver o movimento como era num instante do replay.
+      const at = url.searchParams.get('at');
+      const latestRow = at ? snapshotAt(db, at) : latestSnapshot(db);
       const latest = parseSnapshot(latestRow);
       if (!latest) {
         res.writeHead(200, { 'content-type': 'application/json; charset=utf-8', 'cache-control': 'no-store' });
@@ -100,6 +102,8 @@ export function createMovement({ db } = {}) {
 
       const toMs = Date.parse(latest.ts);
       const fromIso = new Date(toMs - windowMs).toISOString();
+      // Base e inicio sempre no escopo br (snapshotAt/latestSnapshot já filtram),
+      // nunca o exterior gravado no mesmo segundo.
       let baseRow = snapshotAt(db, fromIso);
       const maisAntigo = db
         .prepare("SELECT id, ts, hash, pct, payload FROM snapshot WHERE json_extract(payload, '$.scope') = 'br' ORDER BY ts ASC LIMIT 1")

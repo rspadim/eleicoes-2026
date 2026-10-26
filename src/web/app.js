@@ -568,10 +568,16 @@ function applyMarkets(markets) {
 
 /** Busca movimento e evolução (fora do WebSocket: derivados do histórico). */
 async function loadDerived() {
+  // No replay os cards derivados acompanham o instante exibido, não o ao vivo.
+  const at = store.mode === 'replay' && store.replay.current
+    ? `?at=${encodeURIComponent(new Date(Number(store.replay.current)).toISOString())}`
+    : '';
   try {
-    const [mov, evo] = await Promise.all([
-      fetch('/api/movement').then((r) => (r.ok ? r.json() : null)).catch(() => null),
-      fetch('/api/evolution').then((r) => (r.ok ? r.json() : null)).catch(() => null),
+    const [mov, evo, mk] = await Promise.all([
+      fetch(`/api/movement${at}`).then((r) => (r.ok ? r.json() : null)).catch(() => null),
+      fetch(`/api/evolution${at}`).then((r) => (r.ok ? r.json() : null)).catch(() => null),
+      // Odds do instante exibido (no ao vivo cai no latest).
+      fetch(`/api/markets${at}`).then((r) => (r.ok ? r.json() : null)).catch(() => null),
     ]);
     if (mov) {
       safeUpdate('movement', mov);
@@ -579,6 +585,7 @@ async function loadDerived() {
       safeCall('map', 'setMovement', linhas);
     }
     if (evo) safeUpdate('evolution', evo);
+    if (mk) applyMarkets({ polymarket: mk.polymarket, kalshi: mk.kalshi, ts: mk.ts });
   } catch { /* derivados são opcionais */ }
 }
 
@@ -646,6 +653,7 @@ const socket = createSocket({
           if (ts) store.replay.current = ts;
         }
         applyState(msg.state);
+        if (msg.markets) applyMarkets(msg.markets);
         flashChanges(msg.changes);
         loadDerived();
         break;
@@ -761,6 +769,7 @@ function onSeek(t) {
   store.replay.pauseTs = null;
   socket.send({ type: 'seek', t: ts });
   renderReplay();
+  loadDerived();
 }
 
 function onPlay() {
@@ -776,6 +785,7 @@ function onPlay() {
   store.replay.pauseTs = null;
   socket.send({ type: 'seek', t: Number(alvo) || Date.now() });
   renderReplay();
+  loadDerived();
 }
 
 function onPause() {
@@ -799,6 +809,7 @@ function onLive() {
   socket.send({ type: 'live' });
   loadInitial();
   renderReplay();
+  loadDerived();
 }
 
 const timeToSeek = () => {

@@ -25,7 +25,8 @@ export function createEvolution({ db } = {}) {
     if (url.pathname !== '/api/evolution') return next?.() ?? false;
 
     try {
-      const rows = timeline(db, { limit: 5000 });
+      const at = url.searchParams.get('at');
+      const rows = timeline(db, { limit: 5000, to: at || undefined });
       const ordered = [...rows].reverse();
       const step = Math.max(1, Math.ceil(ordered.length / DEFAULT_POINTS));
 

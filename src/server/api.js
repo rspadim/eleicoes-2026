@@ -56,8 +56,8 @@ function changesBetween(db, prevTs, ts) {
 }
 
 /** Mercados mais recentes por fonte, ja no formato publico. */
-function marketsNow(db) {
-  return latestMarketRows(db);
+function marketsNow(db, at = null) {
+  return latestMarketRows(db, at);
 }
 
 /** Pontos de scrubber em ordem crescente, reduzidos por passo uniforme. */
@@ -200,8 +200,10 @@ export function createApi({ db, bus: events = bus } = {}) {
     }
 
     if (path === '/api/markets') {
-      const markets = marketsNow(db);
-      send(res, 200, { ...markets, ts: new Date().toISOString() });
+      // ?at=<iso> devolve as odds daquele instante (usado no replay).
+      const at = q.get('at');
+      const markets = marketsNow(db, at || null);
+      send(res, 200, { ...markets, ts: at ?? new Date().toISOString(), at: at ?? null });
       return true;
     }
 
@@ -217,6 +219,8 @@ export function createApi({ db, bus: events = bus } = {}) {
         ts: row.ts,
         state,
         changes: changesBetween(db, prev?.ts, row.ts),
+        // Odds da epoca do snapshot (não as de agora).
+        markets: marketsNow(db, row.ts),
         replay: { ts: row.ts, pct: row.pct, mode: 'replay', prevTs: prev?.ts ?? null, speed: 20 },
       });
       return true;
