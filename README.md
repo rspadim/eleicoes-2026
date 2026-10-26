@@ -55,6 +55,10 @@ Copie `.env.example` se preferir.
 
 REST: `GET /api/health`, `/api/state`, `/api/ufs`, `/api/candidates`, `/api/history`, `/api/timeline`, `/api/snapshot/:ts`, `/api/replay/:ts`, `/api/markets`, `/api/exterior`, `/api/movement`, `/api/evolution`.
 
+`/api/markets`, `/api/movement` e `/api/evolution` aceitam `?at=<ISO>` e devolvem o retrato
+daquele instante — é isso que faz o **replay** mostrar as odds, o ranking de variação e o gráfico
+como estavam na época, e não os valores de agora.
+
 WebSocket `/ws`:
 
 ```jsonc
