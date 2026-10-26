@@ -262,6 +262,11 @@ export function createMap(el, { onSelect } = {}) {
 
     const maximo = document.createElement('span');
 
+    // lista de candidatos (camada de líder) — fora da trilha, sempre visível
+    const listaCandidatos = document.createElement('span');
+    listaCandidatos.className = 'map-scale-candidatos';
+    Object.assign(listaCandidatos.style, { display: 'flex', flexWrap: 'wrap', gap: '10px' });
+
     const semDados = document.createElement('span');
     semDados.className = 'map-scale-nodata';
     Object.assign(semDados.style, { display: 'inline-flex', alignItems: 'center', gap: '4px', marginLeft: '8px' });
@@ -276,7 +281,7 @@ export function createMap(el, { onSelect } = {}) {
     textoHachura.textContent = 'sem apuração';
     semDados.append(hachura, textoHachura);
 
-    caixa.append(rotulo, minimo, trilha, maximo, semDados);
+    caixa.append(rotulo, minimo, trilha, maximo, listaCandidatos, semDados);
 
     function amostra(cor, rotuloAmostra) {
       const s = document.createElement('span');
@@ -292,11 +297,30 @@ export function createMap(el, { onSelect } = {}) {
       maximo.style.display = mostrar ? '' : 'none';
     }
 
+    function candidatosDaSituacao() {
+      const nacional = estado?.candidates ?? [];
+      if (nacional.length) return nacional;
+      // sem placar nacional ainda: deriva dos líderes já recebidos por UF
+      const porNumero = new Map();
+      for (const dados of Object.values(estado?.ufs ?? {})) {
+        for (const c of dados?.candidates ?? []) {
+          if (!c || porNumero.has(String(c.n))) continue;
+          porNumero.set(String(c.n), {
+            n: c.n,
+            nmu: c.nmu,
+            color: c.color || corDoCandidato(c.n),
+          });
+        }
+      }
+      return [...porNumero.values()];
+    }
+
     function pintar() {
       const def = LAYERS.find((l) => l.id === camada) ?? LAYERS[0];
       rotulo.textContent = def.hint;
       caixa.setAttribute('aria-label', def.hint);
       amostras.replaceChildren();
+      listaCandidatos.replaceChildren();
 
       semDados.style.display = camada === 'leader' ? '' : 'none';
 
@@ -314,14 +338,21 @@ export function createMap(el, { onSelect } = {}) {
 
       if (camada === 'leader') {
         mostrarTrilha(false);
-        for (const c of (estado?.candidates ?? []).slice(0, 4)) {
+        const lista = candidatosDaSituacao().slice(0, 4);
+        if (!lista.length) {
+          rotulo.textContent = 'Cor = candidato que lidera; intensidade = % dele no estado.';
+          return;
+        }
+        for (const c of lista) {
           const item = document.createElement('span');
           item.className = 'legend-item';
           const sw = document.createElement('span');
           sw.className = 'legend-swatch';
-          sw.style.background = c.color;
-          item.append(sw, document.createTextNode(`${c.nmu ?? c.n} ${fmtPct(Number(c.pct) || 0, 1)}`));
-          amostras.appendChild(item);
+          sw.style.background = c.color || corDoCandidato(c.n);
+          const nome = c.nmu ?? c.n;
+          const pct = Number(c.pct);
+          item.append(sw, document.createTextNode(Number.isFinite(pct) ? `${nome} ${fmtPct(pct, 1)}` : `${nome}`));
+          listaCandidatos.appendChild(item);
         }
         return;
       }
@@ -463,6 +494,7 @@ export function createMap(el, { onSelect } = {}) {
   function render() {
     if (destruido) return;
     garantirAviso();
+    legendaEscala?._repintar?.();
     if (painelFallback) {
       for (const botao of painelFallback.querySelectorAll('button[data-uf]')) {
         const uf = botao.dataset.uf;
