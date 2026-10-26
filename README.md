@@ -39,7 +39,7 @@ Copie `.env.example` se preferir.
 
 ## API
 
-REST: `GET /api/health`, `/api/state`, `/api/ufs`, `/api/candidates`, `/api/history`, `/api/timeline`, `/api/snapshot/:ts`, `/api/replay/:ts`, `/api/markets`, `/api/exterior`.
+REST: `GET /api/health`, `/api/state`, `/api/ufs`, `/api/candidates`, `/api/history`, `/api/timeline`, `/api/snapshot/:ts`, `/api/replay/:ts`, `/api/markets`, `/api/exterior`, `/api/movement`, `/api/evolution`.
 
 WebSocket `/ws`:
 
@@ -55,6 +55,20 @@ WebSocket `/ws`:
 { "type": "speed", "x": 30 }
 { "type": "live" }
 ```
+
+## Camadas do mapa
+
+O mapa tem cinco leituras, trocáveis na própria tela:
+
+| Camada | O que mostra |
+| --- | --- |
+| Líder | Cor do candidato à frente; intensidade = % dele no estado |
+| Vantagem | Intensidade = margem sobre o 2º colocado (p.p.) |
+| Mudança | Verde/vermelho = % do líder subiu/caiu nos últimos 10 min |
+| Abstenção | Rampa 0–40% do eleitorado apto |
+| Apuração | % de seções apuradas (0–100%) |
+
+Abaixo do mapa: **quem subiu, quem caiu** (top 10 por variação na janela de 10 min) e **evolução no tempo** (seções apuradas + % de cada candidato, leitura a leitura).
 
 ## Páginas
 

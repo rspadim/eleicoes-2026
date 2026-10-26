@@ -761,11 +761,17 @@ function onSeek(t) {
 }
 
 function onPlay() {
+  const primeiro = store.replay.timeline[0];
+  // Vindo do ao vivo, "reproduzir" começa do início do histórico; pausado,
+  // retoma do ponto onde parou.
+  const alvo = store.mode === 'live'
+    ? toTs(primeiro?.ts ?? primeiro)
+    : (store.replay.pauseTs ?? store.replay.current);
   store.mode = 'replay';
   store.replay.playing = true;
-  const resume = store.replay.pauseTs ?? store.replay.current;
+  store.replay.finished = false;
   store.replay.pauseTs = null;
-  socket.send({ type: 'seek', t: Number(resume) || Date.now() });
+  socket.send({ type: 'seek', t: Number(alvo) || Date.now() });
   renderReplay();
 }
 
